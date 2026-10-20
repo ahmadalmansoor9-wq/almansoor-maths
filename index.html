@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Almansoor Maths Portal</title>
+<style>
+:root{--bg:#f4f6f1;--card:#fff;--tx:#1b2430;--mu:#5d6b7c;--ac:#2f3a24;--gd:#d9a521;--ok:#1a8f4c;--bad:#c93c3c;--bd:#dde3ec;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1c232c;--tx:#e8edf3;--mu:#9aa8b8;--ac:#6f8f4a;--ok:#4cc27e;--bad:#ff7b7b;--bd:#2b3541;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:680px;margin:0 auto;padding:16px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:18px;margin:0 0 8px}
+.mu{color:var(--mu);margin:4px 0;font-size:14px}.bad{color:var(--bad)}.ok{color:var(--ok);font-size:14px;font-weight:700}.sc{font-size:20px;font-weight:700;color:var(--ok);margin:4px 0}
+label{display:block;margin:12px 0 4px;font-weight:600}
+input,select,textarea{width:100%;box-sizing:border-box;padding:11px;font:inherit;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+input[type=checkbox]{width:auto;margin-right:8px}
+button{font:inherit;cursor:pointer}
+.b{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:700}
+.b:disabled{opacity:.4}
+.g{padding:7px 12px;border:1px solid var(--bd);border-radius:8px;background:transparent;color:var(--tx)}
+.o{display:block;width:100%;text-align:left;margin-top:10px;padding:13px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.o.on{border-color:var(--gd);background:color-mix(in srgb,var(--gd) 18%,var(--bg))}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.bar{height:8px;background:var(--bd);border-radius:6px;margin-bottom:10px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gd)}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.tabs .g.on{background:var(--gd);color:#1b2430;border-color:var(--gd);font-weight:700}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.ck{display:flex;font-weight:400;margin:8px 0}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+</style></head><body><div class="w" id="app"></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,collection,doc,getDoc,getDocs,setDoc,addDoc,updateDoc,deleteDoc,query,where,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+/* STEP 5 IN README: PASTE YOUR FIREBASE SETTINGS AND TEACHER EMAIL HERE */
+const CFG={apiKey:"AIzaSyA5SnkwpABFrRSS3xfmdkjV2-GHO4QlUvE",authDomain:"almansoor-maths.firebaseapp.com",projectId:"almansoor-maths",appId:"1:528856410829:web:fe5325230d0b893c0a5784"};
+const TE="ahmadalmansoor9@gmail.com";
+const S=["Mathematics","Basic Science","Quantitative Reasoning","CRS / IRS","Prevocational Studies"],CL=["Primary 4","Primary 5"],KT=["CA 1","CA 2","Mid Term Exams","Exam"],TM=["First Term 2026/2027","Second Term 2026/2027","Third Term 2026/2027"],TL={Test:1200,Quiz:900};
+const mk=(s,c)=>s.split(";").map(x=>[...x.split(","),c]);
+const P=[...mk("Jayden Maiwada,jayden,sun482;Aisha Kashim Njidda,aisha.k,moon916;Abdulsalam Sani Godowoli,abdulsalam,star237;Fatima Bint-Gabdo,fatima,rose654;Jesse Subete Telu,jesse,lion319;Yusuf Abdulhadi Aliyara,yusuf.a,palm745;Dikko Dikko Abdulkadir,dikko,kite208;Usman Abdulkadir Usman,usman,drum563;Hauwa Muhammad,hauwa,fish871;Abdulhamid Auwal,abdulhamid,bird426;Arfan Bin Abdullahi,arfan,tree192;Aisha Musa Abubakar,aisha.m,cake734;Bilkisu Dahiru,bilkisu,lamp358;Jedidah Musa,jedidah,book605;Unaisah Ibrahim Abdullahi,unaisah,ball247;Samir Yusuf Jibril,samir,cup913;Nathaniel Andetur,nathaniel,hill580;Abubakar Mohammed Bapparu,abubakar,sand471;Rahama Muhammad Baba,rahama,boat826",0),...mk("Fatima Noor Abubakar,fatima.n,dove315;Adamu Abdulaziz Bashir,adamu,gold742;Rufaidah Ibrahim Abdullahi,rufaidah,pearl508;Umar Usman Dahiru,umar.u,lake269;Emmanuel Cletus,emmanuel,hope834;Pepetapwa Reuben Myato,pepetapwa,kind617;Hauwa’u Hussaini,hauwau,sky493;Zainab Abdulaziz Ahmadu,zainab,bee725;Emenike Chinaza Johnson Okafor,emenike,sea386;Umar Abdulhamid Umar,umar.a,oak951;Salma Sani Godowoli,salma,gem204;Yakubu Abdulhadi Aliyara,yakubu.a,fig678;Fa’iza Abdulazeez Buba,faiza,ant539;Mohammed Mustapha Abubakar,mohammed,wind147;Abubakar Muhammed Bello,abubakar.b,mint862;Muhammad Yakubu Buba,muhammad,reed420",1)];
+const W="sun moon star lion palm kite drum fish bird tree lamp ball cup hill sand boat rose gem oak fig".split(" ");
+const app=initializeApp(CFG),sa=initializeApp(CFG,"sec"),au=getAuth(app),sau=getAuth(sa),db=getFirestore(app);
+const $=i=>document.getElementById(i),val=i=>$(i).value,ap=h=>{$("app").innerHTML=h;scrollTo(0,0)};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const col=n=>collection(db,n),fq=async c=>(await getDocs(c)).docs.map(d=>({id:d.id,...d.data()}));
+const bt=async(a,f)=>{for(let i=0;i<a.length;i+=400){const b=writeBatch(db);a.slice(i,i+400).forEach(x=>f(b,x));await b.commit()}};
+const em=(u,v)=>`${u}${v>1?"-v"+v:""}@almansoor.app`,nz=x=>String(x||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const op=(a,v,all,w)=>(all?`<option value="-1">All ${w}</option>`:"")+a.map((s,i)=>`<option value="${i}" ${i==v?"selected":""}>${s}</option>`).join("");
+const so=(v,all)=>op(S,v,all,"subjects"),co=(v,all)=>op(CL,v,all,"classes");
+const Z={tab:"q",qv:"l",fC:-1,fS:-1,sq:"",aS:0,aC:0,gC:0,gS:0,gA:"",pC:0};
+let me,BQ=[],AS=[],US=[],SE=[],RS=[],RQ=[],cq,qi,an,end,iv,qz;
+const qb=id=>BQ.find(q=>q.id===id),rr=id=>RS.find(r=>r.id===id);
+async function ld(){[BQ,AS,US,SE,RS,RQ]=await Promise.all(["questions","assessments","users","secrets","results","reqs"].map(n=>fq(col(n))))}
+async function pld(){[AS,BQ]=await Promise.all([fq(query(col("assessments"),where("c","==",me.c))),fq(query(col("questions"),where("c","==",me.c),where("p","==",true)))]);RS=[];await Promise.all(AS.map(async a=>{const d=await getDoc(doc(db,"results",me.u+"_"+a.id));if(d.exists())RS.push({id:d.id,...d.data()})}))}
+async function mkAcc(u,v,pw){const c=await createUserWithEmailAndPassword(sau,em(u,v),pw);await signOut(sau);return c.user.uid}
+function lv(m){ap(`<div class="c"><h1>Almansoor Maths Portal</h1><p class="mu">Log in to take your tests and quizzes.</p><label>Username</label><input id="u" autocapitalize="off" autocomplete="off"><label>Password</label><input id="p" type="password"><button class="b" onclick="H.login()">Log in</button><p id="lm" class="bad">${m||""}</p><button class="g" onclick="H.fg()">Forgot password?</button></div>`)}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&$("u")&&$("p"))H.login()});
+document.addEventListener("visibilitychange",async()=>{if(document.hidden&&me&&!me.t){if(qz)await fin();clearInterval(iv);me=null;signOut(au);lv("You left the page, so you were logged out.")}});
+const T=()=>{ap(`<div class="top"><b>Almansoor Maths Portal</b><button class="g" onclick="H.out()">Log out</button></div><div class="tabs">`+[["q","Question Bank"],["a","Assessments"],["g","Grade Book"],["p","Pupils"]].map(n=>`<button class="g ${Z.tab===n[0]?"on":""}" onclick="H.z('tab','${n[0]}')">${n[1]}</button>`).join("")+`</div>`+({q:qbk,a:asms,g:gbk,p:pup})[Z.tab]())};
+/* PUPIL */
+function home(){const r=id=>rr(me.u+"_"+id);
+let h=`<div class="top"><b>Hello, ${esc(me.n.split(" ")[0])}! · ${CL[me.c]}</b><button class="g" onclick="H.out()">Log out</button></div><p class="mu">Do not leave this page during a test. If you do, you will be logged out.</p>`,any=0;
+S.forEach((s,i)=>{const l=AS.filter(a=>a.s===i&&a.ids.some(qb));if(!l.length)return;any=1;
+h+=`<div class="c"><h2>${s}</h2>`+l.map(a=>{const n=a.ids.filter(qb).length,x=r(a.id);
+return `<div class="row"><div><b>${esc(a.t)}</b><div class="mu">${a.k} · ${a.y} · ${n} questions · ${TL[a.y]/60} min</div></div>`+(x?`<span class="sc">${x.s}/${x.t}</span>`:`<button class="g" onclick="H.start('${a.id}')">Start</button>`)+`</div>`}).join("")+`</div>`});
+if(!any)h+=`<div class="c">No tests available yet.</div>`;
+ap(h)}
+function tick(){const r=Math.max(0,Math.round((end-Date.now())/1000)),e=$("tm");if(e)e.textContent="⏱ "+String(Math.floor(r/60)).padStart(2,"0")+":"+String(r%60).padStart(2,"0");if(r<=0)fin()}
+function ask(){const q=cq[qi],n=cq.length;
+ap(`<div class="top"><span class="mu">${esc(qz.t)}</span><b id="tm"></b></div><div class="bar"><i style="width:${qi/n*100}%"></i></div><p class="mu">Question ${qi+1} of ${n}</p><div class="c"><h2>${esc(q.q)}</h2>`+q.o.map((o,i)=>`<button class="o" onclick="H.pick(${i},this)">${"ABCD"[i]}. ${esc(o)}</button>`).join("")+`<button id="nx" class="b" disabled onclick="H.next()">${qi==n-1?"Finish":"Next"}</button></div>`);tick()}
+async function fin(){if(!qz)return;clearInterval(iv);const a=qz;qz=null;let s=0,w=[];
+cq.forEach((q,i)=>an[i]===q.a?s++:w.push(`<li>${esc(q.q)} → <b>${esc(q.o[q.a])}</b>${q.e?` <i class="mu">${esc(q.e)}</i>`:""}</li>`));
+RS.push({id:me.u+"_"+a.id,s,t:cq.length});
+try{await setDoc(doc(db,"results",me.u+"_"+a.id),{s,t:cq.length,a:Date.now()})}catch(e){}
+ap(`<div class="c"><h1>Finished!</h1><p class="sc">You scored ${s}/${cq.length}</p>`+(w.length?`<p class="mu">Correct answers to the ones you missed or skipped:</p><ul>${w.join("")}</ul>`:"<p>Perfect score!</p>")+`<button class="b" onclick="H.home()">Back to my page</button></div>`)}
+/* TEACHER */
+const fl=()=>BQ.filter(q=>(Z.fC<0||q.c===Z.fC)&&(Z.fS<0||q.s===Z.fS)&&(!Z.sq||(q.q+" "+q.o.join(" ")).toLowerCase().includes(Z.sq)));
+function qbk(){let h=`<div class="tabs">`+[["l","Questions"],["a","Add question"],["b","Bulk upload CSV"]].map(x=>`<button class="g ${Z.qv==x[0]?"on":""}" onclick="H.z('qv','${x[0]}')">${x[1]}</button>`).join("")+`</div>`;
+if(Z.qv=="a")return h+`<div class="c"><h2>Add a question</h2><label>Class</label><select id="qc">${co(Z.aC)}</select><label>Subject</label><select id="qsel">${so(Z.aS)}</select><label>Question</label><textarea id="qt" rows="3"></textarea>`+[0,1,2,3].map(i=>`<label>Option ${"ABCD"[i]}</label><input id="o${i}">`).join("")+`<label>Correct answer</label><select id="qa">${["A","B","C","D"].map((x,i)=>`<option value="${i}">${x}</option>`).join("")}</select><label>Explanation (optional)</label><input id="qe"><label class="ck"><input type="checkbox" id="qp" checked>Publish now (pupils can see it)</label><button class="b" onclick="H.addQ()">Add question</button><p id="qm" class="bad"></p></div>`;
+if(Z.qv=="b")return h+`<div class="c"><h2>Bulk upload CSV</h2><p class="mu">Columns in this order: subject, class, question, A, B, C, D, answer (A–D), explanation. Subject: ${S.join(", ")}. Class: Primary 4 or Primary 5. A header row is optional.</p><label>Choose a CSV file</label><input type="file" accept=".csv,text/csv,text/plain" onchange="H.rf(this)"><label>Or paste CSV here</label><textarea id="bt" rows="7" placeholder="Mathematics,Primary 4,What is 2 + 2?,3,4,5,6,B,Add the numbers"></textarea><label class="ck"><input type="checkbox" id="bp">Publish imported questions now</label><button class="b" onclick="H.imp()">Import questions</button><p id="bm" class="mu"></p></div>`;
+const l=fl();
+return h+`<div class="c"><h2>Question bank</h2><input placeholder="Search questions… (press Enter)" value="${esc(Z.sq)}" onchange="H.z('sq',this.value.trim().toLowerCase())"><label>Class</label><select onchange="H.z('fC',+this.value)">${co(Z.fC,1)}</select><label>Subject</label><select onchange="H.z('fS',+this.value)">${so(Z.fS,1)}</select><p class="mu">${l.length} shown · ${l.filter(q=>q.p).length} published</p><button class="g" onclick="H.pb(1)">Publish all shown</button> <button class="g" onclick="H.pb(0)">Unpublish all shown</button></div><div class="c">`+(l.length?l.slice(0,50).map(q=>`<div class="row"><div><b>${esc(q.q)}</b><div class="mu">${S[q.s]} · ${CL[q.c]} · ${q.o.map((o,i)=>"ABCD"[i]+") "+esc(o)).join("  ")} · Answer: ${"ABCD"[q.a]}</div>${q.e?`<div class="mu"><i>${esc(q.e)}</i></div>`:""}<span class="${q.p?"ok":"mu"}">${q.p?"● Published":"○ Draft (hidden from pupils)"}</span></div><div><button class="g" onclick="H.tp('${q.id}')">${q.p?"Unpublish":"Publish"}</button><br><button class="g" style="margin-top:6px" onclick="H.dq('${q.id}',this)">Delete</button></div></div>`).join("")+(l.length>50?`<p class="mu">Showing the first 50. Use the filters or search to find others.</p>`:""):'<p class="mu">No questions found.</p>')+`</div>`}
+const ql=()=>{const l=BQ.filter(q=>q.s===Z.aS&&q.c===Z.aC);return l.length?`<label class="ck"><input type="checkbox" onchange="document.querySelectorAll('.qc').forEach(c=>c.checked=this.checked)">Select all</label>`+l.map(q=>`<label class="ck"><input type="checkbox" class="qc" value="${q.id}">${esc(q.q)}${q.p?"":" (draft)"}</label>`).join(""):'<p class="mu">No questions for this class and subject yet.</p>'};
+function asms(){return `<div class="c"><h2>Create assessment</h2><label>Title</label><input id="at"><label>Term</label><select id="am2">${op(TM,0)}</select><label>Class</label><select onchange="H.zl('aC',+this.value)">${co(Z.aC)}</select><label>Subject</label><select onchange="H.zl('aS',+this.value)">${so(Z.aS)}</select><label>Category</label><select id="ak">${op(KT,0)}</select><label>Type</label><select id="ay"><option>Test</option><option>Quiz</option></select><p class="mu">Test: 20 minutes. Quiz: 15 minutes. Pupils only see questions that are published.</p><label>Choose questions</label><div id="qlist">${ql()}</div><button class="b" onclick="H.addA()">Create assessment</button><p id="am" class="bad"></p></div><div class="c"><h2>All assessments</h2>`+(AS.length?AS.map(a=>`<div class="row"><div><b>${esc(a.t)}</b><div class="mu">${CL[a.c]} · ${S[a.s]} · ${a.k} · ${a.y} · ${a.m}<br>${a.ids.filter(qb).length} questions</div></div><button class="g" onclick="H.da('${a.id}',this)">Delete</button></div>`).join(""):'<p class="mu">None yet.</p>')+`</div>`}
+function gbk(){const l=AS.filter(a=>a.s===Z.gS&&a.c===Z.gC),a=l.find(x=>x.id===Z.gA)||l[0];
+let h=`<div class="c"><h2>Grade Book</h2><label>Class</label><select onchange="H.z('gC',+this.value,1)">${co(Z.gC)}</select><label>Subject</label><select onchange="H.z('gS',+this.value,1)">${so(Z.gS)}</select><label>Assessment</label><select onchange="H.z('gA',this.value)">${l.map(x=>`<option value="${x.id}" ${a&&a.id===x.id?"selected":""}>${esc(x.t)} (${x.k})</option>`).join("")}</select>`;
+if(!a)return h+'<p class="mu">No assessments for this class and subject.</p></div>';
+const pl=US.filter(p=>p.c===Z.gC),rw=pl.map(p=>[p.n,p.id,rr(p.id+"_"+a.id)]),d=rw.filter(x=>x[2]);
+return h+`<div class="tw"><table><tr><th>Pupil</th><th>Score</th><th>%</th><th></th></tr>`+rw.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[2]?x[2].s+"/"+x[2].t:"–"}</td><td>${x[2]?Math.round(x[2].s/x[2].t*100)+"%":"–"}</td><td>${x[2]?`<button class="g" onclick="H.rs('${x[2].id}',this)">Reset</button>`:""}</td></tr>`).join("")+`<tr><th>Average</th><th>${d.length?Math.round(d.reduce((n,x)=>n+x[2].s/x[2].t*100,0)/d.length)+"%":"–"}</th><th colspan="2">${d.length}/${pl.length} done</th></tr></table></div><button class="b" onclick="H.cp('${a.id}')">Copy results</button><div id="cm" class="mu"></div></div>`}
+function pup(){const miss=P.filter(p=>!US.find(u=>u.id==p[1])).length,pw=u=>(SE.find(s=>s.id==u)||{}).pw||"",rq=RQ.map(r=>US.find(u=>u.id==r.id)).filter(Boolean);
+return (miss?`<div class="c"><h2>Set up pupil accounts</h2><p class="mu">Creates ${miss} pupil logins for Primary 4 and 5. This takes about a minute. Keep this page open.</p><button class="b" onclick="H.setup()">Create pupil accounts</button><p id="sm" class="mu"></p></div>`:"")+(rq.length?`<div class="c"><h2>Password requests</h2>`+rq.map(p=>`<div class="row"><div><b>${esc(p.n)}</b><div class="mu">${p.id} · ${CL[p.c]}</div></div><button class="g" onclick="H.np('${p.id}')">Give new password</button></div>`).join("")+`</div>`:"")+`<div class="c"><h2>Pupil logins</h2><select onchange="H.z('pC',+this.value)">${co(Z.pC)}</select><div class="tw"><table><tr><th>Pupil</th><th>Username</th><th>Password</th><th></th></tr>`+US.filter(p=>p.c===Z.pC).map(p=>`<tr><td>${esc(p.n)}</td><td>${p.id}</td><td>${esc(pw(p.id))}</td><td><button class="g" onclick="H.np('${p.id}')">New password</button></td></tr>`).join("")+`</table></div></div>`}
+function csv(t){const r=[];let w=[],f="",q=0;for(let i=0;i<t.length;i++){const c=t[i];
+if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=0}else f+=c}
+else if(c=='"')q=1;else if(c==","){w.push(f);f=""}else if(c=="\n"||c=="\r"){if(c=="\r"&&t[i+1]=="\n")i++;w.push(f);r.push(w);w=[];f=""}else f+=c}
+if(f||w.length){w.push(f);r.push(w)}return r.filter(x=>x.some(y=>y.trim()))}
+const two=async(b,f)=>{if(b.dataset.s){await f();await ld();T()}else{b.dataset.s=1;b.textContent="Sure?"}};
+const sh=(id,t)=>{$(id).innerHTML='<textarea rows="8" readonly>'+esc(t)+"</textarea>"};
+const H=window.H={
+async login(){const u=val("u").trim().toLowerCase(),p=val("p");$("lm").textContent="Please wait…";
+try{if(u=="teacher"){await signInWithEmailAndPassword(au,TE,p);me={t:1};await ld();return T()}
+const v=(await getDoc(doc(db,"ver",u))).data();if(!v)throw 0;
+await signInWithEmailAndPassword(au,em(u,v.v),p);
+const d=(await getDoc(doc(db,"users",u))).data();me={n:d.n,u,c:d.c};await pld();home()}
+catch(e){lv("Wrong username or password, or no internet. Try again.")}},
+fg(){ap(`<div class="c"><h2>Forgot password</h2><p class="mu">Enter your username. Teachers: type teacher.</p><input id="u" autocapitalize="off"><button class="b" onclick="H.fg2()">Continue</button><p id="fm" class="bad"></p><button class="g" onclick="H.out()">Back</button></div>`)},
+async fg2(){const u=val("u").trim().toLowerCase();
+if(u=="teacher"){try{await sendPasswordResetEmail(au,TE);$("fm").textContent="A reset link was sent to the teacher email."}catch(e){$("fm").textContent="Could not send the email."}return}
+try{if(!(await getDoc(doc(db,"ver",u))).exists())throw 0;await setDoc(doc(db,"reqs",u),{t:Date.now()});ap(`<div class="c"><h2>Request sent</h2><p>Tell your teacher you forgot your password. Your teacher will give you a new one.</p><button class="b" onclick="H.out()">Back to login</button></div>`)}catch(e){$("fm").textContent="Username not found."}},
+out(){clearInterval(iv);qz=null;me=null;signOut(au);lv()},
+home,
+start(id){const a=AS.find(x=>x.id===id);cq=a.ids.map(qb).filter(Boolean);if(!cq.length)return;qz=a;qi=0;an=[];end=Date.now()+TL[a.y]*1000;clearInterval(iv);iv=setInterval(tick,1000);ask()},
+pick(i,el){an[qi]=i;document.querySelectorAll(".o").forEach(b=>b.classList.remove("on"));el.classList.add("on");$("nx").disabled=false},
+next(){if(++qi<cq.length)return ask();fin()},
+z(k,v,r){Z[k]=v;if(r)Z.gA="";T()},
+zl(k,v){Z[k]=v;$("qlist").innerHTML=ql()},
+async tp(id){const q=qb(id);await updateDoc(doc(db,"questions",id),{p:!q.p});await ld();T()},
+async pb(v){await bt(fl(),(b,q)=>b.update(doc(db,"questions",q.id),{p:!!v}));await ld();T()},
+dq(id,b){two(b,()=>deleteDoc(doc(db,"questions",id)))},
+da(id,b){two(b,()=>deleteDoc(doc(db,"assessments",id)))},
+rs(id,b){two(b,()=>deleteDoc(doc(db,"results",id)))},
+async addQ(){const q=val("qt").trim(),o=[0,1,2,3].map(i=>val("o"+i).trim());
+if(!q||o.some(x=>!x)){$("qm").textContent="Fill in the question and all four options.";return}
+Z.aS=+val("qsel");Z.aC=+val("qc");await addDoc(col("questions"),{s:Z.aS,c:Z.aC,q,o,a:+val("qa"),e:val("qe").trim(),p:$("qp").checked});Z.fS=Z.aS;Z.fC=Z.aC;Z.qv="l";await ld();T()},
+rf(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$("bt").value=r.result};r.readAsText(f)},
+async imp(){const pub=$("bp").checked,L=[];let k=0;
+csv(val("bt")).forEach((r,i)=>{if(!i&&nz(r[0])=="subject")return;
+const s=S.findIndex(x=>nz(x)==nz(r[0])),c=/5/.test(r[1]||"")?1:/4/.test(r[1]||"")?0:-1,o=r.slice(3,7).map(x=>(x||"").trim()),a="ABCD".indexOf((r[7]||"").trim().toUpperCase().charAt(0));
+if(s<0||c<0||!(r[2]||"").trim()||o.length<4||o.some(x=>!x)||a<0){k++;return}
+L.push({s,c,q:r[2].trim(),o,a,e:(r[8]||"").trim(),p:pub})});
+await bt(L,(b,x)=>b.set(doc(col("questions")),x));await ld();
+$("bm").textContent=`${L.length} imported, ${k} skipped. Skipped rows had a wrong subject, class, answer letter, or a missing option.`},
+async addA(){const t=val("at").trim(),ids=[...document.querySelectorAll(".qc:checked")].map(c=>c.value);
+if(!t||!ids.length){$("am").textContent="Add a title and choose at least one question.";return}
+await addDoc(col("assessments"),{t,s:Z.aS,c:Z.aC,y:val("ay"),k:val("ak"),m:TM[$("am2").selectedIndex],ids});await ld();T()},
+cp(id){const a=AS.find(x=>x.id===id),t=["Pupil,Score"].concat(US.filter(p=>p.c===a.c).map(p=>{const r=rr(p.id+"_"+id);return p.n+","+(r?r.s+"/"+r.t:"")})).join("\n");
+try{navigator.clipboard.writeText(t).then(()=>{$("cm").textContent="Copied!"},()=>sh("cm",t))}catch(e){sh("cm",t)}},
+async setup(){const m=$("sm");for(const p of P){if(US.find(x=>x.id==p[1]))continue;m.textContent="Creating "+p[0]+"…";
+try{const uid=await mkAcc(p[1],1,p[2]);await setDoc(doc(db,"users",p[1]),{n:p[0],c:p[3],v:1,uid});await setDoc(doc(db,"ver",p[1]),{v:1});await setDoc(doc(db,"secrets",p[1]),{pw:p[2]})}catch(e){m.textContent="Stopped at "+p[0]+": "+(e.code||e.message)+". Fix it, then press the button again.";return}}
+await ld();T()},
+async np(u){const x=US.find(y=>y.id==u),v=(x.v||1)+1,pw=W[Math.random()*W.length|0]+(100+Math.random()*900|0);
+try{const uid=await mkAcc(u,v,pw);await updateDoc(doc(db,"users",u),{v,uid});await setDoc(doc(db,"ver",u),{v});await setDoc(doc(db,"secrets",u),{pw});try{await deleteDoc(doc(db,"reqs",u))}catch(e){}await ld();T()}catch(e){alert("Could not reset: "+(e.code||e.message))}}
+};
+lv();
+</script></body></html>
